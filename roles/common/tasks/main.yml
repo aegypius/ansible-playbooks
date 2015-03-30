@@ -1,0 +1,19 @@
+---
+- name: check requirements
+  command: /usr/bin/aptitude --version
+  register: valid
+  ignore_errors: True
+
+- locale_gen: name={{ item }} state=present
+  sudo: yes
+  with_items:
+    - en_US.UTF-8
+
+- name: install ansible requirements
+  sudo: yes
+  raw: |-
+    source /etc/profile
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update -q
+    apt-get install -q -y python-apt aptitude
+  when: valid|failed

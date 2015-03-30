@@ -1,0 +1,17 @@
+---
+- name: delete default sudoers security policy
+  raw: sed -i 's/^\(Defaults\s*!secure_path\)/# \1/' /etc/sudoers.d/osmc-no-secure-path
+  sudo: yes
+
+- name: authorize ssh keys
+  authorized_key: user={{ ansible_ssh_user }} key="{{ lookup('file', 'https://github.com/{{ github_username }}.keys') }}"
+
+- name: upgrade packages
+  apt: upgrade=full update_cache=yes cache_valid_time=86400
+  sudo: yes
+
+- name: install packages
+  apt: pkg={{ item }} state=present
+  sudo: yes
+  with_items:
+    - vim
